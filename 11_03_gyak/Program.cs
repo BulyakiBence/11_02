@@ -3,6 +3,8 @@
 // ============================================================================
 // 1. FELADAT: OSZTÁLYZAT-KALKULÁTOR
 // ============================================================================
+using System.Globalization;
+
 int pontszam;
 
 do
@@ -619,3 +621,362 @@ else // 0 pont esetén
     Console.WriteLine("Olvasd újra a fejezeteket! Szükséged lesz még a gyakorlásra.");
 }
 Console.ResetColor();
+
+//11.fel
+
+int edzesekSzama = 0;
+bool sikeresNapBekeres = false;
+
+// 1. Makacs heti edzésszám bekérés (1 és 7 között)
+do
+{
+    Console.Write("Hány edzésed volt a héten? (1-7): ");
+    if (int.TryParse(Console.ReadLine(), out edzesekSzama) && edzesekSzama >= 1 && edzesekSzama <= 7)
+    {
+        sikeresNapBekeres = true;
+    }
+    else
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("Hiba! Kérjük, 1 és 7 közötti egész számot adj meg.");
+        Console.ResetColor();
+    }
+} while (!sikeresNapBekeres);
+
+double osszesTav = 0;
+double leghosszabbTav = -1; // Kezdőérték a maximumkereséshez
+int leghosszabbSorszam = 0;
+
+Console.WriteLine("\nAdja meg az egyes edzések távját kilométerben!");
+
+// 2. Egyes edzések adatainak bekérése
+for (int i = 1; i <= edzesekSzama; i++)
+{
+    double aktualisTav = 0;
+    bool sikeresTavBekeres = false;
+
+    do
+    {
+        Console.Write($"{i}. edzés távja (km): ");
+        if (double.TryParse(Console.ReadLine(), out aktualisTav) && aktualisTav >= 0)
+        {
+            sikeresTavBekeres = true;
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Hiba! Kérjük, érvényes pozitív számot adj meg.");
+            Console.ResetColor();
+        }
+    } while (!sikeresTavBekeres);
+
+    // Összegzés (akkumulálás)
+    osszesTav += aktualisTav;
+
+    // Maximumkeresés (Leghosszabb edzés távja és sorszáma)
+    if (aktualisTav > leghosszabbTav)
+    {
+        leghosszabbTav = aktualisTav;
+        leghosszabbSorszam = i;
+    }
+}
+
+// 3. Statisztika kiszámítása
+double atlagTav = osszesTav / edzesekSzama;
+
+// 4. Eredmények kiíratása
+Console.WriteLine("\n=== HETI ÖSSZESÍTŐ ===");
+Console.WriteLine($"- Összes megtett táv: {osszesTav:F1} km");
+Console.WriteLine($"- Átlagos edzéstáv: {atlagTav:F1} km");
+
+Console.Write("- Leghosszabb edzésed: ");
+Console.ForegroundColor = ConsoleColor.Green;
+Console.WriteLine($"{leghosszabbSorszam}. edzés ({leghosszabbTav:F1} km)");
+Console.ResetColor();
+//12. fel
+
+
+CultureInfo.CurrentCulture = new CultureInfo("hu-HU");
+
+// Árak definiálása konstansként (Bűvös számok elkerülése)
+const int ArVanilia = 450;
+const int ArCsoki = 450;
+const int ArPisztacia = 550;
+
+// Kosár változók (darabszámok)
+int dbVanilia = 0;
+int dbCsoki = 0;
+int dbPisztacia = 0;
+
+bool kasszaFut = true;
+
+while (kasszaFut)
+{
+    Console.WriteLine("\n=== FAGYLALTOZÓ KASSZA ===");
+    Console.WriteLine($"1. Vanília hozzáadása   ({ArVanilia} Ft)");
+    Console.WriteLine($"2. Csoki hozzáadása     ({ArCsoki} Ft)");
+    Console.WriteLine($"3. Pisztácia hozzáadása ({ArPisztacia} Ft)");
+    Console.WriteLine("4. Aktuális rendelés megtekintése");
+    Console.WriteLine("5. FIZETÉS (Számlázás és kosár ürítése)");
+    Console.WriteLine("6. Kilépés");
+    Console.Write("Válasszon műveletet (1-6): ");
+
+    string valasztas = Console.ReadLine();
+    Console.WriteLine();
+
+    switch (valasztas)
+    {
+        case "1":
+            dbVanilia++;
+            Console.WriteLine("-> 1 gombóc Vanília hozzáadva.");
+            break;
+        case "2":
+            dbCsoki++;
+            Console.WriteLine("-> 1 gombóc Csoki hozzáadva.");
+            break;
+        case "3":
+            dbPisztacia++;
+            Console.WriteLine("-> 1 gombóc Pisztácia hozzáadva.");
+            break;
+
+        case "4":
+            int aktualisOsszeg = (dbVanilia * ArVanilia) + (dbCsoki * ArCsoki) + (dbPisztacia * ArPisztacia);
+            int osszGomboc = dbVanilia + dbCsoki + dbPisztacia;
+            Console.WriteLine($"Jelenlegi kosár tartalom ({osszGomboc} gombóc):");
+            if (dbVanilia > 0) Console.WriteLine($" - Vanília: {dbVanilia} db");
+            if (dbCsoki > 0) Console.WriteLine($" - Csoki: {dbCsoki} db");
+            if (dbPisztacia > 0) Console.WriteLine($" - Pisztácia: {dbPisztacia} db");
+            Console.WriteLine($"Részösszeg: {aktualisOsszeg:C0}");
+            break;
+
+        case "5":
+            int vegosszeg = (dbVanilia * ArVanilia) + (dbCsoki * ArCsoki) + (dbPisztacia * ArPisztacia);
+            if (vegosszeg == 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("A kosár még üres! Nem lehet fizetni.");
+                Console.ResetColor();
+                break;
+            }
+
+            Console.WriteLine("=== SZÁMLA ===");
+            if (dbVanilia > 0) Console.WriteLine($"Vanília fagylalt:   {dbVanilia,2} db × {ArVanilia} Ft = {dbVanilia * ArVanilia:C0}");
+            if (dbCsoki > 0) Console.WriteLine($"Csoki fagylalt:     {dbCsoki,2} db × {ArCsoki} Ft = {dbCsoki * ArCsoki:C0}");
+            if (dbPisztacia > 0) Console.WriteLine($"Pisztácia fagylalt: {dbPisztacia,2} db × {ArPisztacia} Ft = {dbPisztacia * ArPisztacia:C0}");
+            Console.WriteLine("--------------------------------------");
+            Console.Write("VÉGÖSSZEG: ");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"{vegosszeg:C0}");
+            Console.ResetColor();
+
+            // Kosár kiürítése a következő vevőhöz
+            dbVanilia = 0;
+            dbCsoki = 0;
+            dbPisztacia = 0;
+            Console.WriteLine("\nSikeres fizetés! A kosár kiürült, jöhet a következő rendelés.");
+            break;
+
+        case "6":
+            kasszaFut = false;
+            Console.WriteLine("Kassza lezárva. Szép napot!");
+            break;
+
+        default:
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Hiba! Érvénytelen menüpont, válasszon 1 és 6 között!");
+            Console.ResetColor();
+            break;
+    }
+}
+
+//12.fel
+
+
+// A teszteléshez beállítjuk a magyar formázást, hogy a pénzösszegnél Ft és ezres tagolás legyen
+CultureInfo.CurrentCulture = new CultureInfo("hu-HU");
+
+// Konstansok a bűvös számok elkerülésére
+const int Sav1Limit = 150;
+const int Sav2Limit = 300;
+const int Sav1Ar = 40;
+const int Sav2Ar = 50;
+const int Sav3Ar = 70;
+
+double fogyasztas = 0;
+bool sikeresBeolvasas = false;
+
+// Makacs adatbekérés
+do
+{
+    Console.Write("Kérjük, adja meg a havi fogyasztást (kWh): ");
+    if (double.TryParse(Console.ReadLine(), out fogyasztas) && fogyasztas >= 0)
+    {
+        sikeresBeolvasas = true;
+    }
+    else
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("Hiba! Kérjük, érvényes pozitív számot adjon meg.");
+        Console.ResetColor();
+    }
+} while (!sikeresBeolvasas);
+
+Console.WriteLine("\n=== VILLANYSZÁMLA RÉSZLETEZŐ ===");
+
+double maradek = fogyasztas;
+int teljesOsszeg = 0;
+
+// 1. SÁV (0 - 150 kWh)
+if (maradek > 0)
+{
+    double sav1Kwh = maradek > Sav1Limit ? Sav1Limit : maradek;
+    int sav1Ar = (int)Math.Round(sav1Kwh * Sav1Ar);
+    Console.WriteLine($"1. sáv (0-{Sav1Limit} kWh): {sav1Kwh,6:F1} kWh × {Sav1Ar} Ft = {sav1Ar:C0}");
+
+    teljesOsszeg += sav1Ar;
+    maradek -= sav1Kwh;
+}
+
+// 2. SÁV (151 - 300 kWh)
+if (maradek > 0)
+{
+    int sav2Kapacitas = Sav2Limit - Sav1Limit;
+    double sav2Kwh = maradek > sav2Kapacitas ? sav2Kapacitas : maradek;
+    int sav2Ar = (int)Math.Round(sav2Kwh * Sav2Ar);
+    Console.WriteLine($"2. sáv ({Sav1Limit + 1}-{Sav2Limit} kWh): {sav2Kwh,6:F1} kWh × {Sav2Ar} Ft = {sav2Ar:C0}");
+
+    teljesOsszeg += sav2Ar;
+    maradek -= sav2Kwh;
+}
+
+// 3. SÁV (300 kWh felett)
+if (maradek > 0)
+{
+    int sav3Ar = (int)Math.Round(maradek * Sav3Ar);
+    Console.WriteLine($"3. sáv ({Sav2Limit} kWh felett): {maradek,6:F1} kWh × {Sav3Ar} Ft = {sav3Ar:C0}");
+
+    teljesOsszeg += sav3Ar;
+}
+
+Console.WriteLine("---------------------------------------------");
+Console.Write("Fizetendő teljes összeg: ");
+Console.ForegroundColor = ConsoleColor.Cyan;
+// A :C0 formázó ezres csoportosítással írja ki a pénzt (pl. 24 500 Ft)
+Console.WriteLine($"{teljesOsszeg:C0}");
+Console.ResetColor();
+
+
+//14 fel
+
+
+Console.WriteLine("=== FORDÍTOTT SZÁMKITALÁLÓ ===");
+Console.WriteLine("Gondolj egy számra 1 és 100 között, a gép megpróbálja kitalálni!");
+Console.WriteLine("Segíts neki a billentyűkkel: [k] = kisebb, [n] = nagyobb, [t] = talált\n");
+
+int min = 1;
+int max = 100;
+int tippekSzama = 0;
+bool kitalalta = false;
+
+while (!kitalalta)
+{
+    // Csalás elleni védelem (ha a felhasználó ellentmondásos válaszokat adott)
+    if (min > max)
+    {
+        Console.ForegroundColor = ConsoleColor.Magenta;
+        Console.WriteLine("Úgy tűnik, valahol elrontottad a visszajelzést! Nincs ilyen szám a tartományban.");
+        Console.ResetColor();
+        break;
+    }
+
+    // A lehetséges tartomány közepe (egészosztással)
+    int tipp = (min + max) / 2;
+    tippekSzama++;
+
+    bool ervenyesValasz = false;
+
+    do
+    {
+        Console.Write($"{tippekSzama}. tippem: {tipp} -> A gondolt szám (k / n / t): ");
+        // A Console.ReadKey().KeyChar egyetlen billentyű leütését olvassa be azonnal
+        char valasz = Console.ReadKey().KeyChar;
+        Console.WriteLine(); // Új sor a szép megjelenítésért
+
+        // Kisbetűssé alakítjuk, hogy a nagybetűs gépelést is elfogadja
+        valasz = char.ToLower(valasz);
+
+        if (valasz == 't')
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"\nSikerült! A gép kitalálta a számodat ({tipp}) pontosan {tippekSzama} tippből!");
+            Console.ResetColor();
+            kitalalta = true;
+            ervenyesValasz = true;
+        }
+        else if (valasz == 'k')
+        {
+            max = tipp - 1; // Ha a gondolt szám kisebb, a maximumot húzzuk lejjebb
+            ervenyesValasz = true;
+        }
+        else if (valasz == 'n')
+        {
+            min = tipp + 1; // Ha a gondolt szám nagyobb, a minimumot toljuk feljebb
+            ervenyesValasz = true;
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Hiba! Érvénytelen billentyű. Csak a 'k', 'n' vagy 't' karaktereket használhatja!");
+            Console.ResetColor();
+        }
+
+    } while (!ervenyesValasz);
+}
+
+
+//15. fel
+
+int eredetiSzam = 0;
+bool sikeresBeolvasas = false;
+
+// Makacs pozitív szám bekérése
+do
+{
+    Console.Write("Kérjük, adjon meg egy pozitív egész számot: ");
+    if (int.TryParse(Console.ReadLine(), out eredetiSzam) && eredetiSzam > 0)
+    {
+        sikeresBeolvasas = true;
+    }
+    else
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("Hiba! Csak pozitív egész számot adhat meg.");
+        Console.ResetColor();
+    }
+} while (!sikeresBeolvasas);
+
+int ideiglenesSzam = eredetiSzam;
+int szamjegyekSzama = 0;
+int szamjegyekOsszege = 0;
+int fordítottSzam = 0;
+
+// Matematikai feldolgozás (szöveggé alakítás nélkül)
+while (ideiglenesSzam > 0)
+{
+    int aktualisSzamjegy = ideiglenesSzam % 10; // Az utolsó számjegy levágása (pl. 2026 % 10 = 6)
+
+    szamjegyekSzama++;
+    szamjegyekOsszege += aktualisSzamjegy;
+
+    // A fordított szám felépítése: az eddigi számot eltoljuk egy helyiértékkel balra (* 10), 
+    // majd hozzáadjuk a frissen levágott jegyet.
+    fordítottSzam = (fordítottSzam * 10) + aktualisSzamjegy;
+
+    ideiglenesSzam /= 10; // Az utolsó számjegy elvetése az egészosztással (pl. 2026 / 10 = 202)
+}
+
+// Eredmények kiíratása
+Console.WriteLine($"\n=== NYOMOZOI JELENTÉS ===");
+Console.WriteLine($"- A számjegyek száma:  {szamjegyekSzama} db");
+Console.WriteLine($"- A számjegyek összege: {szamjegyekOsszege}");
+Console.WriteLine($"- A szám megfordítva:   {fordítottSzam}");
